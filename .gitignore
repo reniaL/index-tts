@@ -36,3 +36,31 @@ desktop.ini
 
 .claude
 .memsearch
+
+# Local runtime data, credentials and personal voice references.
+/.index-tts.local.ps1
+/.env
+/.env.*
+!/.env.example
+/prompts/
+/recordings/
+/references/
+/voice_presets/
+/logs/
+/tmp/
+/checkpoints*/
+/secrets/
+/credentials/
+*.log
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.ogg
+*.pcm
+*.safetensors
+*.pth
+*.pt
+*.ckpt
+*.pem
+*.key
