@@ -19,6 +19,13 @@ if (-not (Test-Path -LiteralPath (Join-Path $indexTtsModelDir 'config.yaml'))) {
 if (-not $CheckOnly -and (Get-NetTCPConnection -LocalPort 17860 -State Listen -ErrorAction SilentlyContinue)) {
     throw 'Port 17860 is already in use. Check http://127.0.0.1:17860.'
 }
+if (-not $CheckOnly) {
+    $indexTtsExisting = Get-CimInstance Win32_Process -Filter "Name = 'python.exe'" |
+        Where-Object { $_.CommandLine -match '\bwebui\.py\b' -and $_.CommandLine -match '--port\s+17860\b' }
+    if ($indexTtsExisting) {
+        throw 'An IndexTTS process for port 17860 is already running or loading. Wait for it or stop it before retrying.'
+    }
+}
 
 $indexTtsUv = (Get-Command uv -ErrorAction Stop).Source
 $env:UV_PROJECT_ENVIRONMENT = $indexTtsVirtualEnv
