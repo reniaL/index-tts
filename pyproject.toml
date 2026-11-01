@@ -47,7 +47,7 @@ dependencies = [
   "numba==0.63.0",
   "numpy==2.2.6",
   "omegaconf>=2.3.0",
-  "opencv-python==4.9.0.80",
+  "opencv-python==4.11.0.86",
   "pandas==2.3.2",
   "safetensors==0.5.2",
   "sentencepiece>=0.2.1",
@@ -61,10 +61,10 @@ dependencies = [
   "transformers==4.52.1",
   "openai-whisper>=20231117",
   "fugashi[unidic-lite]",
-
   # Use "wetext" on Windows/Mac, otherwise "WeTextProcessing" on Linux.
   "wetext>=0.0.9; sys_platform != 'linux'",
   "WeTextProcessing; sys_platform == 'linux'",
+  "httpx[socks]==0.28.1",
 ]
 
 [project.optional-dependencies]
@@ -119,6 +119,18 @@ build-backend = "hatchling.build"
 # wheel instead of compiling.
 deepspeed = [{ requirement = "torch", match-runtime = true }]
 flash-attn = [{ requirement = "torch", match-runtime = true }]
+
+# Local resolver metadata copied from the upstream lockfile. FlashAttention is
+# not installed for the basic Windows WebUI; this avoids building it to resolve.
+[[tool.uv.dependency-metadata]]
+name = "flash-attn"
+version = "2.8.3.post1"
+requires-dist = ["torch", "einops"]
+
+[[tool.uv.dependency-metadata]]
+name = "deepspeed"
+version = "0.17.1"
+requires-dist = ["einops", "hjson", "msgpack", "ninja", "numpy", "packaging>=20.0", "psutil", "py-cpuinfo", "pydantic>=2.0.0", "torch", "tqdm"]
 
 [tool.uv.sources]
 # Install PyTorch with CUDA support on Linux/Windows (CUDA doesn't exist for Mac).
