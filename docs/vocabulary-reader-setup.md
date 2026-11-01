@@ -1,7 +1,7 @@
 # Vocabulary reader: stage 1 baseline
 
-Stage 1 prepares version control and preserves the working Windows setup. The
-vocabulary reader UI and audio processing are planned for stage 2.
+Stage 1 prepares version control and preserves the working Windows setup.
+Stage 2 is implemented; see [the vocabulary reader guide](vocabulary-reader.md).
 
 - Upstream: https://github.com/index-tts/index-tts
 - Base code: `d9e41aac89fd00b3d71497fddb287b7f24613712`

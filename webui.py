@@ -99,6 +99,7 @@ IS_V25 = cmd_args.version == "2.5"
 import gradio as gr
 from indextts.utils.examples_downloader import ensure_examples_available
 from indextts.utils.presets import list_presets, save_preset, load_preset, delete_preset
+from tools.vocabulary_ui import build_vocabulary_tab
 from tools.i18n.i18n import I18nAuto
 
 if IS_V25:
@@ -163,6 +164,7 @@ def build_tts(use_accel=False, use_torch_compile=False):
 
 
 tts = build_tts(use_accel=cmd_args.accel, use_torch_compile=cmd_args.torch_compile)
+inference_lock = threading.Lock()
 # 支持的语言列表
 LANGUAGES = {
     "中文": "zh_CN",
@@ -651,7 +653,6 @@ def gen_single(emo_control_method,prompt, text,
     if not output_path:
         output_path = os.path.join("outputs", f"spk_{int(time.time())}.wav")
     # set gradio progress
-    tts.gr_progress = progress
     do_sample, top_p, top_k, temperature, \
         length_penalty, num_beams, repetition_penalty, max_mel_tokens = args
 
@@ -698,7 +699,9 @@ def gen_single(emo_control_method,prompt, text,
     if IS_V25:
         infer_kwargs["lang"] = lang_choice or "ZH"
         infer_kwargs["duration_factor"] = float(duration_factor)
-    output = tts.infer(**infer_kwargs)
+    with inference_lock:
+        tts.gr_progress = progress
+        output = tts.infer(**infer_kwargs)
     return gr.update(value=output,visible=True)
 
 def update_prompt_audio():
@@ -1002,6 +1005,8 @@ with gr.Blocks(
                     scale=2,
                 )
                 create_preset_btn = gr.Button(i18n("创建"), scale=1)
+
+    build_vocabulary_tab(tts, inference_lock, cmd_args.version)
 
     # ---------------------------------------------------------------------------
     # Save Preset Modal (global overlay, placed after all tabs)
@@ -1386,10 +1391,12 @@ with gr.Blocks(
                              duration_factor,
                              *advanced_params,
                      ],
-                     outputs=[output_audio])
+                     outputs=[output_audio],
+                     concurrency_id="tts-inference", concurrency_limit=1)
 
 
 
 if __name__ == "__main__":
     demo.queue(20)
-    demo.launch(server_name=cmd_args.host, server_port=cmd_args.port,share=cmd_args.share)
+    demo.launch(server_name=cmd_args.host, server_port=cmd_args.port,share=cmd_args.share,
+                allowed_paths=[os.path.realpath("outputs")])
