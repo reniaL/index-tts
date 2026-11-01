@@ -38,6 +38,7 @@ desktop.ini
 .memsearch
 
 # Local runtime data, credentials and personal voice references.
+/local/
 /.index-tts.local.ps1
 /.env
 /.env.*
